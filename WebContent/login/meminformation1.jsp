@@ -1,0 +1,538 @@
+<%@page import="login.SignVO"%>
+<%@page import="login.SignDAO"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+        <jsp:useBean id="vo" class="login.SignVO"></jsp:useBean>
+	<!-- useBean액션태그 : new를 가지고 객체생성, import역할 -->
+	<jsp:setProperty property="*" name="vo"/>
+	
+   <%  
+   		String id = (String) session.getAttribute("id");
+		SignDAO dao = new SignDAO();
+		SignVO vo2 = dao.one(id);
+
+	%>
+	
+    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- 뷰포트 -->
+	<meta name="viewport" content="width=device-width" initial-scale="1">
+	<!-- 스타일시트 참조  -->
+	<title>AppleMango 회원 정보</title>
+	<link rel="stylesheet" href="css/styles.css">
+	<link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+	<!-- Google fonts-->
+<link href="https://fonts.googleapis.com/css?family=Montserrat:400,700"
+	rel="stylesheet" type="text/css" />
+<link
+	href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic"
+	rel="stylesheet" type="text/css" />
+	<script src="https://use.fontawesome.com/releases/v5.13.0/js/all.js"
+	crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+  
+  var id = "<%=id%>";
+  
+  function check(){
+		 search = document.getElementById('search').value
+		  
+		  if(search.length == 0){
+			  location.href = "bbs.jsp";
+		  }else{
+			  document.getElementById('form').submit();
+			  return false;
+		  }
+	 } 
+  
+  
+  
+  
+  $(function () { 
+	  if(id=="null"){
+		  location.href = "memlogin.html";
+	  }
+	 
+  $("#pw1").keyup(function() {
+	  pw = document.getElementById('pw').value
+	  pw1 = document.getElementById('pw1').value
+
+      if (pw != pw1) {
+         $('#result5').html('<font color=red><b>ⓘ 입력한 암호가 일치하지 않습니다.</b></font>')
+      }else if(pw == pw1){
+         $('#result5').html('<font color=blue><b>ⓘ 입력한 암호 사용가능 합니다.</b></font>')
+      }else if(pw1.length() <= 8){
+    	  $('#result5').html('<font color=blue><b>ⓘ 암호를 8자 이상 재입력하십시오.</b></font>')
+      }
+	  
+  })
+})
+  
+ /* function check(){
+	 	id = document.getElementById("id").value
+		birth = document.getElementById("name").value
+		name = document.getElementById("birth").value
+		tel = document.getElementById("tel").value
+		pw = document.getElementById("pw").value
+		pw1 = document.getElementById("pw1").value
+		if (name.length == 0) {
+			document.getElementById('result2').innerHTML = '<font color=red><b>ⓘ 이름을 입력하세요.</b></font>'
+		}else if (name.length <= 5)  {
+			document.getElementById('result2').innerHTML = '<font color=red><b>ⓘ 이름을 2글자 이상 입력하세요.</b></font>'
+		}
+	  	if(birth.length == 0){
+			document.getElementById('result3').innerHTML = '<font color=red><b>ⓘ 유효한 생년월일을 입력하십시오.</b></font>'
+		}
+		if(id.length == 0){
+			document.getElementById('result1').innerHTML = '<font color=red><b>ⓘ AppleMango ID로 사용할 유효한 이메일 주소를 입력하십시오.</b></font>'
+		}
+		if(pw.length == 0){
+			document.getElementById('result5').innerHTML = '<font color=red><b>ⓘ 암호를 재입력하십시오.</b></font>'
+		}else if (pw.length <= 5)  {
+			document.getElementById('result5').innerHTML = '<font color=red><b>ⓘ 암호를 5자 이상 재입력하십시오.</b></font>'
+		}
+		if (pw != pw1){
+			document.getElementById('result5').innerHTML = '<font color=red><b>ⓘ 입력한 암호가 일치하지 않습니다.</b></font>'
+		}
+		if(tel.length == 0){
+			document.getElementById('result4').innerHTML = '<font color=red><b>ⓘ 유효한 전화번호를 입력하십시오.</b></font>'	
+		}	
+  }		*/ 
+  </script>
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+   <script>
+      function sample6_execDaumPostcode() {
+          new daum.Postcode({
+              oncomplete: function(data) {
+                  // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                  // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+                  // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                  var addr = ''; // 주소 변수
+                  var extraAddr = ''; // 참고항목 변수
+
+                  //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+                  if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                      addr = data.roadAddress;
+                  } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                      addr = data.jibunAddress;
+                  }
+
+                  // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+                  if(data.userSelectedType === 'R'){
+                      // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                      // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                      if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                          extraAddr += data.bname;
+                      }
+                      // 건물명이 있고, 공동주택일 경우 추가한다.
+                      if(data.buildingName !== '' && data.apartment === 'Y'){
+                          extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                      }
+                      // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                      if(extraAddr !== ''){
+                          extraAddr = ' (' + extraAddr + ')';
+                      }
+                      // 조합된 참고항목을 해당 필드에 넣는다.
+                      document.getElementById("address1").value = extraAddr;
+                  
+                  } else {
+                      document.getElementById("address1").value = '';
+                  }
+
+                  // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                  document.getElementById('postcode').value = data.zonecode;
+                  document.getElementById("address").value = addr;
+                  // 커서를 상세주소 필드로 이동한다.
+                  document.getElementById("address2").focus();
+              }
+          }).open();
+      }
+  </script>
+</head>
+<style>
+
+
+label.a{
+	width : 100%;
+	float:center;
+	text-align:center;
+}
+label.b{
+	font-size: 35px;
+	width : 100px;
+	float:left;
+	text-align:left;
+}
+
+label{
+	width : 800px;
+	float:right;
+}
+.form-control{
+	width : 800px;
+	float:right;
+}
+.form-control2{
+	width : 100px;
+	background-color : rightgray;
+	float: right;
+}
+
+.head {
+  padding-top: calc(6rem + 74px);
+  padding-bottom: 4rem;
+}
+
+</style>
+<body>
+	<nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav" style="background : #000 !important;">
+            <div class="container">
+                <a class="navbar-brand js-scroll-trigger" href="../index.jsp"><img style="width: 50px" src="img/full_color.png" alt="" />AppleMANGO</a>
+                <button class="navbar-toggler navbar-toggler-right text-uppercase font-weight-bold bg-secondary text-white rounded" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    Menu
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="../product/product_all.jsp">Products</a></li>
+                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="../music/New.jsp">Music</a></li>
+                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="customer.jsp">고객지원</a></li>
+                        <li class="nav-item mx-0 mx-lg-1"><a style="padding: 5px" class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="../product/call_list.jsp"><img style="width: 30px" src="img/cart.png" alt="" /></a></li>
+                        <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="memlogin.html">Login</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+
+<div class="container">
+  <div class="head">
+  <input type="image" src="img/2.JPG"  alt="AppleMango ID 생성" width="100%">
+  <label class="a">고객님의 AppleMango ID는 입니다.</label>
+  <label class="a">AppleMang ID로 모든 AppleMango 제품 및 서비스에 로그인하십시오.<br></label>
+  <label class="b">계정</label><br>
+  	</div>
+  <form action="meminformation.jsp">
+  <div class="form-group">
+      <label for="id">새 AppleMango ID로 사용될 주소입니다.</label>
+      <input type="email" class="form-control" name="id" id="id"
+      placeholder="ex) asdf1234@google.com" value="<%= session.getAttribute("id") %>" required>
+      <label id='result1'></label>
+    </div>
+    <div class="form-group">
+      <label for="name">이름:</label>
+      <input type="text" class="form-control" name="name" id="name" value="<%= vo2.getName() %>" required>
+      <label id='result2'></label>
+    </div>
+    
+    <div class="form-group">
+      <label for="birth">생년월일:</label><br>
+      <label for="birth" style="color: gray">일부 AppleMango 서비스를 활성화하려면 올바른 생년월일을 제공해야 합니다.</label>
+      <input type="date" class="form-control" name="birth" id="birth" value="<%= vo2.getBirth() %>"required>
+      <label id='result3'></label>
+    </div>
+    
+    <div class="form-group">
+      <label for="tel">전화번호:</label>
+      <input type="tel" class="form-control" name="tel"
+      placeholder="ex) 010-1234-5678" pattern="[0-9]{3}-[0-9]{4}-[0-9]{4}" id="tel" value="<%= vo2.getTel() %>"required>
+      <label id='result4'></label>      
+    </div>
+    
+   <div class="form-group">
+    <label for="pwd">주  소:</label>
+    <input class="form-control" type="text" name="postcode" id="postcode" placeholder="우편번호" value="<%= vo2.getPostcode() %>"required>
+    <input class="form-control2" type="button" onclick="sample6_execDaumPostcode()" value="우편 찾기">
+    <input class="form-control" type="text" name="address" id="address" value="<%= vo2.getAddress() %>" placeholder="주소"><br>
+	<input class="form-control" type="text" name="address1" id="address1" value="<%= vo2.getAddress1() %>" placeholder="참고항목">
+	<input class="form-control" type="text" name="address2" id="address2" value="<%= vo2.getAddress2() %>" placeholder="상세주소">
+	
+    </div>
+    
+    <div class="form-group">
+      <label for="pw">새암호:</label><br>  
+      <label class="b">보안</label><br>
+      <label for="pw" style="color: gray">추측하기 쉽거나 다른 웹사이트에서 사용한 암호는 선택하지 마십시오.</label>
+      <input type="text" class="form-control" name="pw" id="pw" value="<%= vo2.getPw() %>" required>
+      
+    </div>
+    <div class="form-group">
+      <label for="pw1">암호확인:</label>
+      <input type="text" class="form-control" name="pw1"  id="pw1" value="<%= vo2.getPw() %>"  required>
+      <label id='result5'></label>
+    </div> 
+    
+    <label class="a">항상 사용할 수 있는 전화번호를 입력하십시오. 새 기기나 웹 브라우저에 로그인할 때</label>
+    <label class="a">해당 전화번호를 사용하여 신원을 확인합니다. 메시지 또는 데이터 요금이 적용될 수 있습니다.</label>
+    
+    <div class="form-group">
+      <input onclick = "check()" type="submit" class="form-control1" value="정 보 수 정" name="login">
+    </div>
+    
+    
+  </form>
+</div>
+
+ <!-- Footer-->
+        <footer class="footer text-center">
+            <div class="container">
+                <div class="row">
+                    <!-- Footer Location-->
+                    <div class="col-lg-4 mb-5 mb-lg-0">
+                        <h4 class="text-uppercase mb-4">Location</h4>
+                        <p class="lead mb-0">
+                          	  서울특별시 마포구 신촌로 94,
+                            <br />
+                           	 7층(노고산동, 그랜드플라자)
+                        </p>
+                    </div>
+                    <!-- Footer Social Icons-->
+                    <div class="col-lg-4 mb-5 mb-lg-0">
+                        <h4 class="text-uppercase mb-4">Around the Web</h4>
+                        <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-facebook-f"></i></a>
+                        <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-twitter"></i></a>
+                        <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-linkedin-in"></i></a>
+                        <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-dribbble"></i></a>
+                    </div>
+                    <!-- Footer About Text-->
+                    <div class="col-lg-4">
+                        <h4 class="text-uppercase mb-4">About Freelancer</h4>
+                        <p class="lead mb-0">
+                            Freelance is a free to use, MIT licensed Bootstrap theme created by
+                            <a href="http://startbootstrap.com">Start Bootstrap</a>
+                            .
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+         <!-- Copyright Section-->
+        <div class="copyright py-4 text-center text-white">
+            <div class="container"><small>Copyright © AppleMango 2020</small></div>
+        </div>
+        <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes)-->
+        <div class="scroll-to-top d-lg-none position-fixed">
+            <a class="js-scroll-trigger d-block text-center text-white rounded" href="#page-top"><i class="fa fa-chevron-up"></i></a>
+        </div>
+        <!-- Portfolio Modals-->
+        <!-- Portfolio Modal 1-->
+        <div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" role="dialog" aria-labelledby="portfolioModal1Label" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="fas fa-times"></i></span>
+                    </button>
+                    <div class="modal-body text-center">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8">
+                                    <!-- Portfolio Modal - Title-->
+                                    <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0" id="portfolioModal1Label">Log Cabin</h2>
+                                    <!-- Icon Divider-->
+                                    <div class="divider-custom">
+                                        <div class="divider-custom-line"></div>
+                                        <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                        <div class="divider-custom-line"></div>
+                                    </div>
+                                    <!-- Portfolio Modal - Image-->
+                                    <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="" />
+                                    <!-- Portfolio Modal - Text-->
+                                    <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                    <button class="btn btn-primary" data-dismiss="modal">
+                                        <i class="fas fa-times fa-fw"></i>
+                                        Close Window
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Portfolio Modal 2-->
+        <div class="portfolio-modal modal fade" id="portfolioModal2" tabindex="-1" role="dialog" aria-labelledby="portfolioModal2Label" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="fas fa-times"></i></span>
+                    </button>
+                    <div class="modal-body text-center">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8">
+                                    <!-- Portfolio Modal - Title-->
+                                    <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0" id="portfolioModal2Label">Tasty Cake</h2>
+                                    <!-- Icon Divider-->
+                                    <div class="divider-custom">
+                                        <div class="divider-custom-line"></div>
+                                        <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                        <div class="divider-custom-line"></div>
+                                    </div>
+                                    <!-- Portfolio Modal - Image-->
+                                    <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cake.png" alt="" />
+                                    <!-- Portfolio Modal - Text-->
+                                    <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                    <button class="btn btn-primary" data-dismiss="modal">
+                                        <i class="fas fa-times fa-fw"></i>
+                                        Close Window
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Portfolio Modal 3-->
+        <div class="portfolio-modal modal fade" id="portfolioModal3" tabindex="-1" role="dialog" aria-labelledby="portfolioModal3Label" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="fas fa-times"></i></span>
+                    </button>
+                    <div class="modal-body text-center">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8">
+                                    <!-- Portfolio Modal - Title-->
+                                    <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0" id="portfolioModal3Label">Circus Tent</h2>
+                                    <!-- Icon Divider-->
+                                    <div class="divider-custom">
+                                        <div class="divider-custom-line"></div>
+                                        <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                        <div class="divider-custom-line"></div>
+                                    </div>
+                                    <!-- Portfolio Modal - Image-->
+                                    <img class="img-fluid rounded mb-5" src="assets/img/portfolio/circus.png" alt="" />
+                                    <!-- Portfolio Modal - Text-->
+                                    <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                    <button class="btn btn-primary" data-dismiss="modal">
+                                        <i class="fas fa-times fa-fw"></i>
+                                        Close Window
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Portfolio Modal 4-->
+        <div class="portfolio-modal modal fade" id="portfolioModal4" tabindex="-1" role="dialog" aria-labelledby="portfolioModal4Label" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="fas fa-times"></i></span>
+                    </button>
+                    <div class="modal-body text-center">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8">
+                                    <!-- Portfolio Modal - Title-->
+                                    <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0" id="portfolioModal4Label">Controller</h2>
+                                    <!-- Icon Divider-->
+                                    <div class="divider-custom">
+                                        <div class="divider-custom-line"></div>
+                                        <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                        <div class="divider-custom-line"></div>
+                                    </div>
+                                    <!-- Portfolio Modal - Image-->
+                                    <img class="img-fluid rounded mb-5" src="assets/img/portfolio/game.png" alt="" />
+                                    <!-- Portfolio Modal - Text-->
+                                    <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                    <button class="btn btn-primary" data-dismiss="modal">
+                                        <i class="fas fa-times fa-fw"></i>
+                                        Close Window
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Portfolio Modal 5-->
+        <div class="portfolio-modal modal fade" id="portfolioModal5" tabindex="-1" role="dialog" aria-labelledby="portfolioModal5Label" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="fas fa-times"></i></span>
+                    </button>
+                    <div class="modal-body text-center">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8">
+                                    <!-- Portfolio Modal - Title-->
+                                    <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0" id="portfolioModal5Label">Locked Safe</h2>
+                                    <!-- Icon Divider-->
+                                    <div class="divider-custom">
+                                        <div class="divider-custom-line"></div>
+                                        <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                        <div class="divider-custom-line"></div>
+                                    </div>
+                                    <!-- Portfolio Modal - Image-->
+                                    <img class="img-fluid rounded mb-5" src="assets/img/portfolio/safe.png" alt="" />
+                                    <!-- Portfolio Modal - Text-->
+                                    <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                    <button class="btn btn-primary" data-dismiss="modal">
+                                        <i class="fas fa-times fa-fw"></i>
+                                        Close Window
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Portfolio Modal 6-->
+        <div class="portfolio-modal modal fade" id="portfolioModal6" tabindex="-1" role="dialog" aria-labelledby="portfolioModal6Label" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="fas fa-times"></i></span>
+                    </button>
+                    <div class="modal-body text-center">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8">
+                                    <!-- Portfolio Modal - Title-->
+                                    <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0" id="portfolioModal6Label">Submarine</h2>
+                                    <!-- Icon Divider-->
+                                    <div class="divider-custom">
+                                        <div class="divider-custom-line"></div>
+                                        <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                        <div class="divider-custom-line"></div>
+                                    </div>
+                                    <!-- Portfolio Modal - Image-->
+                                    <img class="img-fluid rounded mb-5" src="assets/img/portfolio/submarine.png" alt="" />
+                                    <!-- Portfolio Modal - Text-->
+                                    <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                    <button class="btn btn-primary" data-dismiss="modal">
+                                        <i class="fas fa-times fa-fw"></i>
+                                        Close Window
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+        <!-- Third party plugin JS-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+        <!-- Contact form JS-->
+        <script src="assets/mail/jqBootstrapValidation.js"></script>
+        <script src="assets/mail/contact_me.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+
+</body>
+</html>
